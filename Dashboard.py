@@ -364,6 +364,8 @@ def date_range_picker(key_prefix):
             unsafe_allow_html=True
         )
         st.markdown('</div>', unsafe_allow_html=True)
+        
+    
     
     # Monthly Mode
     elif mode == "Monthly":
@@ -741,7 +743,7 @@ def _skpi(_, cards, start_date, end_date):
                 f'<span style="display:inline-flex;align-items:center;gap:4px;'
                 f'background:{bdg_bg};color:{bdg_col};font-size:.7rem;font-weight:800;'
                 f'padding:3px 10px;border-radius:20px;">{bdg_lbl}</span>'
-                f'<span style="font-size:.65rem;color:#9ca3af;font-weight:500;">'
+                f'<span style="font-size:.65rem;font-weight:500;">'
                 f'vs {prev_m_lbl}: <b style="color:#6b7280;">{prev_str}</b></span>'
                 f'</div>'
             )
@@ -991,6 +993,67 @@ elif section == "Customer":
         layout_dict['margin'] = dict(l=10, r=60, t=16, b=10)
         fig_orgs.update_layout(**layout_dict)
         _cc("Top 10 Organisations", "By sample volume", fig_orgs)
+        # ───────── PUT YOUR NEW CODE HERE ─────────
+
+        # ── 👥 Daily Customers: New vs Repeat ──
+        st.markdown("### 👥 Daily Customers — New vs Repeat")
+
+        selected_date = end
+
+        daily_data = df[df['Service Date'].dt.date == selected_date].copy()
+
+        if len(daily_data) > 0:
+
+            daily_customers = daily_data['Organization'].unique()
+            customer_rows = []
+
+            for customer in daily_customers:
+
+                today_count = len(
+                    daily_data[daily_data['Organization'] == customer]
+                )
+
+                before_date = df[
+                    (df['Organization'] == customer) &
+                    (df['Service Date'].dt.date < selected_date)
+                ]
+
+                is_repeat = "Repeat" if len(before_date) > 0 else "New"
+                badge = "🟢" if is_repeat == "Repeat" else "🆕"
+
+                customer_rows.append({
+                    "Status": f"{badge} {is_repeat}",
+                    "Customer": customer,
+                    "Samples Today": today_count,
+                    "Total Before": len(before_date) if is_repeat == "Repeat" else "—"
+                })
+
+            customer_rows = sorted(
+                customer_rows,
+                key=lambda x: (x["Status"], x["Customer"])
+            )
+
+            # Custom styled table
+            df_customers = pd.DataFrame(customer_rows)
+            
+            # Build HTML table
+            table_html = '<div style="background:#fff;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.07);overflow:hidden;margin-bottom:16px;">'
+            table_html += '<div style="display:flex;padding:12px 16px;background:#f9fafb;border-bottom:2px solid #e5e7eb;"><span style="flex:1;font-size:.59rem;font-weight:800;color:#111827;text-transform:uppercase;letter-spacing:.07em;">Status</span><span style="flex:2;font-size:.59rem;font-weight:800;color:#111827;text-transform:uppercase;letter-spacing:.07em;">Customer</span><span style="flex:1;text-align:right;font-size:.59rem;font-weight:800;color:#111827;text-transform:uppercase;letter-spacing:.07em;">Today</span><span style="flex:1;text-align:right;font-size:.59rem;font-weight:800;color:#111827;text-transform:uppercase;letter-spacing:.07em;">Before</span></div>'
+            
+            for ri, row in enumerate(customer_rows):
+                bg = '#fafafa' if ri % 2 == 0 else '#fff'
+                table_html += f'<div style="display:flex;padding:11px 16px;background:{bg};border-bottom:1px solid #f3f4f6;align-items:center;">'
+                table_html += f'<span style="flex:1;font-size:.82rem;font-weight:600;color:#111827;">{row["Status"]}</span>'
+                table_html += f'<span style="flex:2;font-size:.82rem;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{row["Customer"]}</span>'
+                table_html += f'<span style="flex:1;text-align:right;font-size:.82rem;font-weight:700;color:#111827;">{row["Samples Today"]}</span>'
+                table_html += f'<span style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#6b7280;">{row["Total Before"]}</span>'
+                table_html += '</div>'
+            
+            table_html += '</div>'
+            st.markdown(table_html, unsafe_allow_html=True)
+
+        else:
+            st.info("No customer activity on selected end date.")
 
 
 # ── 🔬 NISTI PERFORMANCE ──────────────────────────────────────────────
