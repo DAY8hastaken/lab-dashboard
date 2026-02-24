@@ -75,7 +75,7 @@ html,body,[class*="css"]{font-family:'DM Sans',sans-serif}
 [data-baseweb="calendar"] [data-baseweb="select"] > div{background:#fff!important;color:#111827!important;border:1.5px solid #e5e7eb!important;border-radius:8px!important;box-shadow:none!important;}
 
 /* Global default button styling - override */
-.stButton button{background:#fff!important;color:#111827!important;border:1.5px solid #d1d5db!important;border-radius:10px!important;padding:10px 14px!important;font-size:.85rem!important;font-weight:700!important;font-family:'DM Sans',sans-serif!important;transition:all .2s ease!important;box-shadow:0 2px 6px rgba(0,0,0,.08)!important}
+.stButton button{background:#fff!important;color:#111827!important;border:1.5px solid #d1d5db!important;border-radius:10px!important;padding:10px 14px!important;font-size:.95rem!important;font-weight:700!important;font-family:'DM Sans',sans-serif!important;transition:all .2s ease!important;box-shadow:0 2px 6px rgba(0,0,0,.08)!important}
 .stButton button:hover{background:#f9fafb!important;color:#111827!important;box-shadow:0 4px 10px rgba(0,0,0,.12)!important;border-color:#9ca3af!important}
 .stButton button:active{background:#fff!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important}
 .stButton button:focus{box-shadow:0 0 0 3px rgba(124,58,237,.1),0 2px 6px rgba(0,0,0,.08)!important;border-color:#7c3aed!important}
@@ -91,40 +91,39 @@ html,body,[class*="css"]{font-family:'DM Sans',sans-serif}
 .dr-mode-buttons > div{flex:1!important;min-width:0!important}
 
 /* Date Input Styling */
-[data-testid="stNumberInput"] input,[data-testid="stNumberInput"] > div > div > input{background:#fff!important;color:#111827!important;border:1.5px solid #e5e7eb!important;border-radius:10px!important;font-family:'DM Sans',sans-serif!important;font-size:.85rem!important;font-weight:500!important;padding:9px 12px!important;}
+[data-testid="stNumberInput"] input,[data-testid="stNumberInput"] > div > div > input{background:#fff!important;color:#111827!important;border:1.5px solid #e5e7eb!important;border-radius:10px!important;font-family:'DM Sans',sans-serif!important;font-size:1rem!important;font-weight:600!important;padding:12px 14px!important;}
 [data-testid="stNumberInput"] input:focus,[data-testid="stNumberInput"] > div > div > input:focus{border-color:#7c3aed!important;box-shadow:0 0 0 3px rgba(124,58,237,.12)!important;outline:none!important;background:#fff!important;color:#111827!important;}
 
 /* Number input step buttons */
-[data-testid="stNumberInput"] [role="button"],[data-testid="stNumberInput"] > div > div > button{background:#fff!important;color:#111827!important;border:1px solid #e5e7eb!important;cursor:pointer!important;font-weight:600!important}
+[data-testid="stNumberInput"] [role="button"],[data-testid="stNumberInput"] > div > div > button{background:#fff!important;color:#111827!important;border:1px solid #e5e7eb!important;cursor:pointer!important;font-weight:700!important;font-size:.95rem!important}
 [data-testid="stNumberInput"] [role="button"]:hover,[data-testid="stNumberInput"] > div > div > button:hover{background:#f9fafb!important;color:#111827!important;border-color:#d1d5db!important}
 
 /* Selectbox styling for mode pickers */
 [data-testid="stSelectbox"] > div > div{background:#fff!important;color:#111827!important;border:1.5px solid #e5e7eb!important;border-radius:10px!important;}
+[data-testid="stSelectbox"] [role="listbox"],[data-testid="stSelectbox"] svg{color:#111827!important;font-size:1rem!important;font-weight:600!important}
+[data-testid="stSelectbox"] span,[data-testid="stSelectbox"] p{font-size:1rem!important;font-weight:600!important;color:#111827!important}
 
 .dr-card{background:#fff;border-radius:24px;padding:22px 26px 20px;margin-bottom:32px;box-shadow:0 6px 32px rgba(124,58,237,.10),0 1px 4px rgba(0,0,0,.04);animation:fadeUp .38s cubic-bezier(.22,1,.36,1) both;position:relative;overflow:hidden}
 .dr-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#7c3aed 0%,#3b82f6 25%,#06b6d4 50%,#059669 75%,#f59e0b 100%);border-radius:24px 24px 0 0}
 .dr-blob1{position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.07),transparent 70%);pointer-events:none}
 .dr-blob2{position:absolute;bottom:-20px;left:-20px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(5,150,105,.06),transparent 70%);pointer-events:none}
-.dr-header{display:flex;align-items:center;margin-bottom:14px}
-.dr-title{font-size:.72rem;font-weight:900;color:#111827;text-transform:uppercase;letter-spacing:.14em;display:flex;align-items:center;gap:8px}
-.dr-title-pill{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff!important;font-size:.55rem;font-weight:800;padding:2px 9px;border-radius:20px;letter-spacing:.08em;box-shadow:0 2px 8px rgba(124,58,237,.35)}
-.dr-pill-btn .stButton button{background:linear-gradient(135deg,#f5f3ff,#ede9fe)!important;border:1.5px solid #ddd6fe!important;border-radius:20px!important;padding:5px 16px!important;font-size:.7rem!important;font-weight:700!important;color:#5b21b6!important;min-width:0!important;width:auto!important;transition:all .2s cubic-bezier(.34,1.56,.64,1)!important;box-shadow:none!important;font-family:'DM Sans',sans-serif!important}
+.dr-header{display:flex;align-items:center;margin-bottom:16px}
+.dr-title{font-size:.85rem;font-weight:900;color:#111827;text-transform:uppercase;letter-spacing:.14em;display:flex;align-items:center;gap:8px}
+.dr-title-pill{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff!important;font-size:.65rem;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:.08em;box-shadow:0 2px 8px rgba(124,58,237,.35)}.dr-pill-btn .stButton button{background:linear-gradient(135deg,#f5f3ff,#ede9fe)!important;border:1.5px solid #ddd6fe!important;border-radius:20px!important;padding:8px 18px!important;font-size:.8rem!important;font-weight:700!important;color:#5b21b6!important;min-width:0!important;width:auto!important;transition:all .2s cubic-bezier(.34,1.56,.64,1)!important;box-shadow:none!important;font-family:'DM Sans',sans-serif!important}
 .dr-pill-btn .stButton button:hover{background:linear-gradient(135deg,#7c3aed,#6d28d9)!important;color:#fff!important;border-color:#7c3aed!important;transform:translateY(-2px)!important;box-shadow:0 6px 16px rgba(124,58,237,.3)!important}
-.dr-field-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.13em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.lbl-from{color:#7c3aed}.lbl-to{color:#059669}
+.dr-field-label{font-size:.75rem!important;font-weight:800!important;text-transform:uppercase;letter-spacing:.13em;margin-bottom:8px!important;display:flex;align-items:center;gap:6px;color:#111827!important}.lbl-from{color:#7c3aed}.lbl-to{color:#059669}
 .lbl-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
 .lbl-dot-from{background:linear-gradient(135deg,#7c3aed,#a78bfa);box-shadow:0 0 6px rgba(124,58,237,.5)}
 .lbl-dot-to{background:linear-gradient(135deg,#059669,#34d399);box-shadow:0 0 6px rgba(5,150,105,.5)}
 .dr-arrow-wrap{display:flex;align-items:center;justify-content:center;padding-top:26px}
 .dr-arrow-icon{font-size:1.4rem;color:#c4b5f4;animation:arrowBounce 2s ease-in-out infinite}
 @keyframes arrowBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
-.dr-summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1.5px solid #a7f3d0;border-radius:14px;padding:10px 16px;margin-top:14px}
-.dr-sum-from{font-size:.78rem;font-weight:800;color:#065f46}
-.dr-sum-arrow{color:#34d399;font-size:1.1rem}
-.dr-sum-to{font-size:.78rem;font-weight:800;color:#065f46}
-.dr-sum-days{font-size:.68rem;font-weight:600;color:#6b7280}
-.dr-sum-badge{margin-left:auto;background:linear-gradient(135deg,#059669,#10b981);color:#fff!important;font-size:.65rem;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:.07em;box-shadow:0 3px 10px rgba(5,150,105,.3);white-space:nowrap}
-
+.dr-summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1.5px solid #a7f3d0;border-radius:14px;padding:12px 18px;margin-top:16px}
+.dr-sum-from{font-size:.9rem;font-weight:800;color:#065f46}
+.dr-sum-arrow{color:#34d399;font-size:1.2rem}
+.dr-sum-to{font-size:.9rem;font-weight:800;color:#065f46}
+.dr-sum-days{font-size:.8rem;font-weight:600;color:#6b7280}
+.dr-sum-badge{margin-left:auto;background:linear-gradient(135deg,#059669,#10b981);color:#fff!important;font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:20px;letter-spacing:.07em;box-shadow:0 3px 10px rgba(5,150,105,.3);white-space:nowrap}
 /* Chart cards */
 .cc{background:#fff;border-radius:20px;padding:20px 18px 12px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px;opacity:0;animation:fadeUp .55s cubic-bezier(.22,1,.36,1) both;transition:transform .28s,box-shadow .28s;position:relative;overflow:hidden}
 .cc-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0;background:linear-gradient(90deg,#7c3aed,#3b82f6,#059669);opacity:0;transition:opacity .3s}
@@ -291,8 +290,8 @@ def date_range_picker(key_prefix):
         start, end = selected_date, selected_date
         cnt = len(df[(df['Service Date'] >= pd.Timestamp(start)) & (df['Service Date'] <= pd.Timestamp(end))])
         st.markdown(
-            f'<div style="margin-top:12px; padding:10px 12px; background:white; border-radius:8px; border:1px solid #bfdbfe;">'
-            f'<span style="font-size:.75rem; font-weight:700; color:#1e40af;">✦ {cnt:,} samples on {start.strftime("%d %b %Y")}</span>'
+            f'<div style="margin-top:12px; padding:14px 16px; background:white; border-radius:8px; border:1px solid #bfdbfe;">'
+            f'<span style="font-size:.9rem; font-weight:700; color:#1e40af;">✦ {cnt:,} samples on {start.strftime("%d %b %Y")}</span>'
             f'</div>',
             unsafe_allow_html=True
         )
@@ -317,8 +316,8 @@ def date_range_picker(key_prefix):
         
         cnt = len(df[(df['Service Date'] >= pd.Timestamp(start)) & (df['Service Date'] <= pd.Timestamp(end))])
         st.markdown(
-            f'<div style="margin-top:12px; padding:10px 12px; background:white; border-radius:8px; border:1px solid #a7f3d0;">'
-            f'<span style="font-size:.75rem; font-weight:700; color:#065f46;">✦ {cnt:,} samples in {selected_month} {selected_year}</span>'
+            f'<div style="margin-top:12px; padding:14px 16px; background:white; border-radius:8px; border:1px solid #a7f3d0;">'
+            f'<span style="font-size:.9rem; font-weight:700; color:#065f46;">✦ {cnt:,} samples in {selected_month} {selected_year}</span>'
             f'</div>',
             unsafe_allow_html=True
         )
@@ -336,8 +335,8 @@ def date_range_picker(key_prefix):
         
         cnt = len(df[(df['Service Date'] >= pd.Timestamp(start)) & (df['Service Date'] <= pd.Timestamp(end))])
         st.markdown(
-            f'<div style="margin-top:12px; padding:10px 12px; background:white; border-radius:8px; border:1px solid #fde68a;">'
-            f'<span style="font-size:.75rem; font-weight:700; color:#78350f;">✦ {cnt:,} samples in {selected_year}</span>'
+            f'<div style="margin-top:12px; padding:14px 16px; background:white; border-radius:8px; border:1px solid #fde68a;">'
+            f'<span style="font-size:.9rem; font-weight:700; color:#78350f;">✦ {cnt:,} samples in {selected_year}</span>'
             f'</div>',
             unsafe_allow_html=True
         )
