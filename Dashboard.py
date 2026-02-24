@@ -17,14 +17,54 @@ html,body,[class*="css"]{font-family:'DM Sans',sans-serif}
 /* Sidebar */
 [data-testid="stSidebar"]{background:linear-gradient(175deg,#0a0820 0%,#130e3d 50%,#1c1548 100%)!important;border-right:none!important;box-shadow:6px 0 32px rgba(0,0,0,.45)!important}
 [data-testid="stSidebar"] *{color:#b8b0e8!important;font-family:'DM Sans',sans-serif!important}
-[data-testid="stSidebar"] .stButton button{background:transparent!important;border:none!important;border-radius:12px!important;padding:11px 14px!important;font-size:.88rem!important;font-weight:500!important;color:#b8b0e8!important;width:100%!important;text-align:left!important;font-family:'DM Sans',sans-serif!important;box-shadow:none!important;transition:all .22s cubic-bezier(.34,1.56,.64,1)!important}
+
+/* Navigation buttons - KEEP FULLY FUNCTIONAL */
+[data-testid="stSidebar"] .stButton button{background:transparent!important;border:none!important;border-radius:12px!important;padding:11px 14px!important;font-size:.88rem!important;font-weight:500!important;color:#b8b0e8!important;width:100%!important;text-align:left!important;font-family:'DM Sans',sans-serif!important;box-shadow:none!important;transition:all .22s cubic-bezier(.34,1.56,.64,1)!important;cursor:pointer!important;pointer-events:auto!important}
 [data-testid="stSidebar"] .stButton button:hover{background:rgba(255,255,255,.08)!important;color:#fff!important;transform:translateX(5px)!important}
 [data-testid="stSidebar"] .stButton button:focus{box-shadow:none!important;outline:none!important;border:none!important}
 [data-testid="stSidebar"] .nav-active-wrap .stButton button{background:rgba(124,58,237,.22)!important;color:#fff!important;font-weight:700!important;border-left:3px solid #a78bfa!important;border-radius:0 12px 12px 0!important;padding-left:13px!important}
 [data-testid="stSidebar"] .nav-active-wrap .stButton button:hover{background:rgba(124,58,237,.30)!important;transform:none!important}
 [data-testid="stSidebar"] [data-testid="stVerticalBlock"]{gap:1px!important}
 [data-testid="stSidebar"] .stButton{margin:0 6px!important}
-[data-testid="collapsedControl"],button[kind="header"]{display:none!important}
+
+/* 🔒 Force sidebar to stay open */
+section[data-testid="stSidebar"] {
+    min-width: 280px !important;
+    max-width: 280px !important;
+    transform: none !important;
+}
+/* ❌ Hide collapse button (top arrow button) */
+button[data-testid="baseButton-header"] {
+    display: none !important;
+}
+/* ❌ Hide chevron toggle icon */
+[data-testid="stSidebarCollapseButton"] {
+    display: none !important;
+}
+/* ❌ Hide any remaining header buttons */
+header [data-testid="baseButton-header"] {
+    display: none !important;
+}
+/* ❌ Disable sidebar collapsing animation */
+[data-testid="stSidebar"] > div:first-child {
+    width: 280px !important;
+    min-width: 280px !important;
+}
+/* 🔒 Prevent hidden sidebar state */
+[data-testid="stSidebar"][aria-expanded="false"] {
+    transform: none !important;
+    margin-left: 0 !important;
+}
+/* ❌ Hide collapse controls completely */
+[data-testid="collapsedControl"]{display:none!important;visibility:hidden!important;width:0!important;height:0!important;margin:0!important;padding:0!important;border:none!important;pointer-events:none!important;overflow:hidden!important}
+[data-testid="collapsedControl"] *{display:none!important;visibility:hidden!important;pointer-events:none!important}
+button[kind="header"]{display:none!important;visibility:hidden!important;pointer-events:none!important}
+.viewerBadge_container__1QSob{display:none!important}
+[data-testid="stBaseButton-header"]{display:none!important;visibility:hidden!important}
+button[aria-label*="close"],button[aria-label*="open"]{display:none!important}
+[data-testid="stSidebar"]{display:block!important;visibility:visible!important}
+#MainMenu{visibility:hidden!important}
+
 .nav-active-wrap{position:relative}
 .nav-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(124,58,237,.32);border:1px solid rgba(167,139,250,.35);border-radius:20px;padding:2px 9px 2px 7px;font-size:.55rem;font-weight:800;color:#c4b5f4!important;letter-spacing:.09em;text-transform:uppercase;margin:0 8px 5px 8px}
 .nav-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;box-shadow:0 0 7px 2px rgba(167,139,250,.75);animation:pulse 1.9s ease-in-out infinite;flex-shrink:0}
@@ -94,9 +134,37 @@ html,body,[class*="css"]{font-family:'DM Sans',sans-serif}
 [data-testid="stNumberInput"] input,[data-testid="stNumberInput"] > div > div > input{background:#fff!important;color:#111827!important;border:1.5px solid #e5e7eb!important;border-radius:10px!important;font-family:'DM Sans',sans-serif!important;font-size:1rem!important;font-weight:600!important;padding:12px 14px!important;}
 [data-testid="stNumberInput"] input:focus,[data-testid="stNumberInput"] > div > div > input:focus{border-color:#7c3aed!important;box-shadow:0 0 0 3px rgba(124,58,237,.12)!important;outline:none!important;background:#fff!important;color:#111827!important;}
 
-/* Number input step buttons */
-[data-testid="stNumberInput"] [role="button"],[data-testid="stNumberInput"] > div > div > button{background:#fff!important;color:#111827!important;border:1px solid #e5e7eb!important;cursor:pointer!important;font-weight:700!important;font-size:.95rem!important}
-[data-testid="stNumberInput"] [role="button"]:hover,[data-testid="stNumberInput"] > div > div > button:hover{background:#f9fafb!important;color:#111827!important;border-color:#d1d5db!important}
+/* 🔢 Number input step buttons (+ / −) — FORCE WHITE */
+[data-testid="stNumberInput"] button {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 1.5px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-weight: 700 !important;
+    font-size: .95rem !important;
+    padding: 8px 12px !important;
+    transition: all .2s ease !important;
+}
+/* Hover */
+[data-testid="stNumberInput"] button:hover {
+    background: #f9fafb !important;
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08) !important;
+}
+/* Make + and − clearly visible */
+[data-testid="stNumberInput"] svg {
+    fill: #111827 !important;
+    stroke: #111827 !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+/* Remove dark mode effect from hosting */
+[data-testid="stNumberInput"] {
+    background: transparent !important;
+}
 
 /* Selectbox styling for mode pickers */
 [data-testid="stSelectbox"] > div > div{background:#fff!important;color:#111827!important;border:1.5px solid #e5e7eb!important;border-radius:10px!important;}
