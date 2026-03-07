@@ -4,9 +4,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from utils import (
     CSS, load_data, check_login, render_sidebar, render_footer,
-    date_range_picker, apply_dr, _skpi, _cc, _page_header, _lo, BLK, MN
+    date_range_picker, apply_dr, _skpi, _cc, _tbl, _page_header, _lo, BLK, MN
 )
 import plotly.express as px
+import pandas as pd
 
 st.set_page_config(
     page_title="LabCare · Financial",
@@ -15,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 st.markdown(CSS, unsafe_allow_html=True)
-check_login()
+check_login("Financial")
 render_sidebar("Financial")
 
 # ══════════════════════════════════════════════════════════ PAGE ══════
@@ -24,8 +25,8 @@ df, params_df, param_rows, org_info = load_data()
 _page_header("Pages / Financial", "💰 Financial",
              "Revenue performance by lab, province and customer type.")
 
-start, end    = date_range_picker("rev", df)
-flt, _, n     = apply_dr(df, param_rows, start, end)
+start, end = date_range_picker("rev", df)
+flt, _, n  = apply_dr(df, param_rows, start, end)
 
 if n == 0:
     st.info("No records found for the selected date range.")
@@ -52,12 +53,12 @@ _skpi(None, [
     ('On-Time %',   f'Avg {MN[fr_m]}–{MN[to_m]}',   '#4d96ff','#000', ot_by_m,   total_ot,   'pct',    ot_by_m.get(pr_m,0),   ot_by_m.get(to_m,0)),
 ], start, end)
 
-# ── Charts ──
+# ── Revenue charts ──
 rev_lab  = flt.groupby('Laboratory')['Revenue'].sum().sort_values(ascending=False)
 rev_prov = flt.groupby('Province')['Revenue'].sum().sort_values(ascending=False)
 ct       = flt.groupby('Customer Type')['Revenue'].sum().sort_values(ascending=False)
 
-PIE_COLORS  = ['#7c3aed','#3b82f6','#059669','#f59e0b','#ef4444','#ec4899','#06b6d4']
+PIE_COLORS = ['#7c3aed','#3b82f6','#059669','#f59e0b','#ef4444','#ec4899','#06b6d4']
 
 
 def _pie(labels, values, title, subtitle, colors=PIE_COLORS):
@@ -77,7 +78,6 @@ def _pie(labels, values, title, subtitle, colors=PIE_COLORS):
 
 
 def _hist_h(labels, values, title, subtitle, color='#7c3aed'):
-    import pandas as pd
     df_h = pd.DataFrame({'label': labels, 'value': values}).sort_values('value')
     fig  = px.bar(df_h, x='value', y='label', orientation='h',
                   text='value', color_discrete_sequence=[color])

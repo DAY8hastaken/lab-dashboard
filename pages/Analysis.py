@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 st.markdown(CSS, unsafe_allow_html=True)
-check_login()
+check_login("Analysis")
 render_sidebar("Analysis")
 
 # ══════════════════════════════════════════════════════════ PAGE ══════
@@ -106,36 +106,6 @@ with c_lab2:
         f"Basic / Standard / Premium ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})",
         fig_pie_svc, h=300)
 
-# ── Lab × Service Type table ──
-st.markdown(
-    '<div style="background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);'
-    'border-radius:28px;padding:20px;margin:20px 0 0 0;'
-    'box-shadow:0 4px 28px rgba(59,130,246,.09),0 1px 4px rgba(0,0,0,.04);'
-    'border:1.5px solid rgba(59,130,246,.15);">',
-    unsafe_allow_html=True
-)
-
-all_services     = ['Basic','Standard','Premium']
-lab_service_rows = []
-for lab in lab_service.index:
-    row   = {'Laboratory': lab}
-    total = 0
-    for svc in all_services:
-        count    = int(lab_service.loc[lab, svc]) if svc in lab_service.columns else 0
-        row[svc] = count
-        total   += count
-    row['Total'] = total
-    lab_service_rows.append(row)
-
-lab_service_rows.sort(key=lambda x: x['Total'], reverse=True)
-
-_tbl("Lab Samples by Service Type",
-     f"Sample count: Basic / Standard / Premium ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})",
-     lab_service_rows, accent='#3b82f6',
-     cols=['Laboratory','Basic','Standard','Premium','Total'])
-
-st.markdown('</div>', unsafe_allow_html=True)
-
 # ══════════════════════════════════════════════ PARAMETER ANALYSIS ══
 st.markdown(
     '<div style="display:flex;align-items:center;gap:10px;margin:28px 0 14px;">'
@@ -197,41 +167,4 @@ with c4:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ── Parameters by Laboratory table ──
-st.markdown(
-    '<div style="background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);'
-    'border-radius:28px;padding:20px;margin:20px 0 0 0;'
-    'box-shadow:0 4px 28px rgba(245,158,11,.09),0 1px 4px rgba(0,0,0,.04);'
-    'border:1.5px solid rgba(245,158,11,.15);">',
-    unsafe_allow_html=True
-)
-
-lab_param  = flt_params.groupby(['Laboratory','Parameter']).size().unstack(fill_value=0)
-all_params = p_cnt['Parameter'].tolist()
-all_labs   = list(lab_param.index)
-lab_rows   = []
-
-for param in all_params:
-    unit_cost = price_map.get(param, 0)
-    row = {'Parameter': param, 'Unit Cost': f"${unit_cost:,.0f}"}
-    total_count = 0
-    for lab in all_labs:
-        cnt_val = int(lab_param.loc[lab, param]) if param in lab_param.columns else 0
-        row[lab]          = f"{cnt_val:,}"
-        row[f"{lab} Rev"] = f"${cnt_val * unit_cost:,.0f}"
-        total_count      += cnt_val
-    row['Total Count']   = f"{total_count:,}"
-    row['Total Revenue'] = f"${total_count * unit_cost:,.0f}"
-    lab_rows.append(row)
-
-col_order = ['Parameter','Unit Cost']
-for lab in all_labs:
-    col_order += [lab, f"{lab} Rev"]
-col_order += ['Total Count','Total Revenue']
-
-_tbl("Parameters by Laboratory — Count & Revenue",
-     "Test count and estimated revenue per parameter per lab",
-     lab_rows, accent='#f59e0b', cols=col_order)
-
-st.markdown('</div>', unsafe_allow_html=True)
-
 render_footer()
