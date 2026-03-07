@@ -13,9 +13,10 @@ if st.session_state.get("logged_in"):
 
 # ── Users ──
 USERS = {
-    "finance":   {"password": "finance123",   "role": "Finance",   "display": "Finance Team",     "page": "Financial"},
-    "customer":  {"password": "customer123",  "role": "Customer",  "display": "Customer Service", "page": "Customer"},
-    "technique": {"password": "technique123", "role": "Technique", "display": "Technique Team",   "page": "Analysis"},
+    "finance":    {"password": "finance123",    "role": "Finance",    "display": "Finance Team",     "page": "Financial"},
+    "customer":   {"password": "customer123",   "role": "Customer",   "display": "Customer Service", "page": "Customer"},
+    "technique":  {"password": "technique123",  "role": "Technique",  "display": "Technique Team",   "page": "Analysis"},
+    "superadmin": {"password": "superadmin123", "role": "SuperAdmin", "display": "Super Admin",      "page": "Financial"},
 }
 
 st.markdown("""
@@ -104,6 +105,7 @@ st.markdown("""
       <span class="demo-badge">finance / finance123</span>
       <span class="demo-badge">customer / customer123</span>
       <span class="demo-badge">technique / technique123</span>
+      <span class="demo-badge">superadmin / superadmin123</span>
     </div>
   </div>
 </div>

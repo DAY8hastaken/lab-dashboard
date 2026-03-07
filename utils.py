@@ -212,40 +212,45 @@ def load_data():
 
 # Users — role controls which page they can access
 USERS = {
-    "finance":   {"password": "finance123",   "role": "Finance",   "display": "Finance Team",       "page": "Financial"},
-    "customer":  {"password": "customer123",  "role": "Customer",  "display": "Customer Service",   "page": "Customer"},
-    "technique": {"password": "technique123", "role": "Technique", "display": "Technique Team",     "page": "Analysis"},
+    "finance":    {"password": "finance123",    "role": "Finance",    "display": "Finance Team",     "page": "Financial"},
+    "customer":   {"password": "customer123",   "role": "Customer",   "display": "Customer Service", "page": "Customer"},
+    "technique":  {"password": "technique123",  "role": "Technique",  "display": "Technique Team",   "page": "Analysis"},
+    "superadmin": {"password": "superadmin123", "role": "SuperAdmin", "display": "Super Admin",      "page": "Financial"},
 }
 
-# Maps role → the single page they are allowed to visit
+# Maps role → list of pages they are allowed to visit
 ROLE_PAGE = {
-    "Finance":   "Financial",
-    "Customer":  "Customer",
-    "Technique": "Analysis",
+    "Finance":    ["Financial", "LabRevenue"],
+    "Customer":   ["Customer", "DailyCustomers", "LabServiceType"],
+    "Technique":  ["Analysis"],
+    "SuperAdmin": ["Financial", "LabRevenue", "Customer", "DailyCustomers", "LabServiceType", "Analysis"],
 }
 
 # Full nav config (icon, sidebar label, page key)
 ALL_NAV = [
-    ("💰", "Financial",        "Financial"),
-    ("👥", "Customer",         "Customer"),
-    ("🔬", "NISTI Performance","Analysis"),
+    ("💰", "Financial",           "Financial"),
+    ("📊", "Lab Count & Revenue", "LabRevenue"),
+    ("👥", "Customer",            "Customer"),
+    ("📋", "Daily Customers",     "DailyCustomers"),
+    ("🧪", "Lab Service Type",    "LabServiceType"),
+    ("🔬", "NISTI Performance",   "Analysis"),
 ]
 
 
 def check_login(current_page: str = ""):
     """
     Verify the user is logged in AND is allowed to view current_page.
-    Redirects to login or their home page if not authorised.
+    Redirects to login or their first allowed page if not authorised.
     """
     if not st.session_state.get("logged_in"):
         st.switch_page("main.py")
         st.stop()
 
     if current_page:
-        role      = st.session_state["user"]["role"]
-        allowed   = ROLE_PAGE.get(role, "")
-        if allowed and current_page != allowed:
-            st.switch_page(f"pages/{allowed}.py")
+        role    = st.session_state["user"]["role"]
+        allowed = ROLE_PAGE.get(role, [])
+        if allowed and current_page not in allowed:
+            st.switch_page(f"pages/{allowed[0]}.py")
             st.stop()
 
 
@@ -261,9 +266,9 @@ def render_sidebar(active_page: str):
     role = user.get("role", "")
 
     # Which nav items this role can see
-    allowed_page = ROLE_PAGE.get(role, "")
-    visible_nav  = [(icon, label, key) for icon, label, key in ALL_NAV
-                    if key == allowed_page]
+    allowed_pages = ROLE_PAGE.get(role, [])
+    visible_nav   = [(icon, label, key) for icon, label, key in ALL_NAV
+                     if key in allowed_pages]
 
     with st.sidebar:
         st.markdown(
