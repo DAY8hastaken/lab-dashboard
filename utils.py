@@ -11,9 +11,20 @@ _BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
 _EXCEL_PATH = os.path.join(_BASE_DIR, "Lab_Service_2025_2000rows_MergedOrg.xlsx")
 
 # ══════════════════════════════════════════════════════ CONSTANTS ══════
-BLK = "#111827"
-MN  = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',
-       7:'Jul',8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'}
+BLK        = "#111827"
+MN         = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',
+              7:'Jul',8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'}
+USD_TO_KHR = 4000          # 1 USD = 4 000 KHR
+KHR_SYM    = '\u17db'      # \u17db = \u17db (Khmer currency symbol)
+
+def fmt_riel(usd_val: float) -> str:
+    """Convert USD to KHR and return formatted string with \u17db symbol."""
+    khr = usd_val * USD_TO_KHR
+    if abs(khr) >= 1_000_000_000:
+        return f"{khr/1_000_000_000:,.2f}B\u17db"
+    if abs(khr) >= 1_000_000:
+        return f"{khr/1_000_000:,.2f}M\u17db"
+    return f"{khr:,.0f}\u17db"
 MONTH_ORD = {'Jan':0,'Feb':1,'Mar':2,'Apr':3,'May':4,'Jun':5,
              'Jul':6,'Aug':7,'Sep':8,'Oct':9,'Nov':10,'Dec':11}
 
@@ -222,8 +233,8 @@ USERS = {
 ROLE_PAGE = {
     "Finance":    ["Financial", "LabRevenue"],
     "Customer":   ["Customer", "DailyCustomers", "LabServiceType"],
-    "Technique":  ["Analysis"],
-    "SuperAdmin": ["Financial", "LabRevenue", "Customer", "DailyCustomers", "LabServiceType", "Analysis"],
+    "Technique":  ["Analysis", "CertError"],
+    "SuperAdmin": ["Financial", "LabRevenue", "Customer", "DailyCustomers", "LabServiceType", "Analysis", "CertError"],
 }
 
 # Full nav config (icon, sidebar label, page key)
@@ -234,6 +245,7 @@ ALL_NAV = [
     ("📋", "Daily Customers",     "DailyCustomers"),
     ("🧪", "Lab Service Type",    "LabServiceType"),
     ("🔬", "NISTI Performance",   "Analysis"),
+    ("⚠️",  "Certificate Errors", "CertError"),
 ]
 
 
@@ -423,7 +435,7 @@ def _make_sparkline_svg(vals, accent, fmt, card_uid, from_m=1, to_m=12, width=30
     MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
     def _fmtv(v, f):
-        if f == 'dollar': return f'${v:,.0f}'
+        if f == 'dollar': return fmt_riel(v)
         if f == 'pct':    return f'{v:.1f}%'
         if f == 'days':   return f'{v:.1f}d'
         return f'{int(v):,}'
@@ -528,7 +540,7 @@ def _skpi(_, cards, start_date, end_date):
     ACCENTS = ['#7c3aed','#3b82f6','#059669','#f59e0b']
 
     def _fmt(v, fmt):
-        if fmt == 'dollar': return f'${v:,.0f}'
+        if fmt == 'dollar': return fmt_riel(v)
         if fmt == 'pct':    return f'{v:.1f}%'
         if fmt == 'days':   return f'{v:.1f}d'
         return f'{int(v):,}'
