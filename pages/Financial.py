@@ -3,6 +3,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from utils import (
+    fmt_riel,
     CSS, load_data, check_login, render_sidebar, render_footer,
     date_range_picker, apply_dr, _skpi, _cc, _tbl, _page_header, _lo, BLK, MN
 )
@@ -62,11 +63,12 @@ PIE_COLORS = ['#7c3aed','#3b82f6','#059669','#f59e0b','#ef4444','#ec4899','#06b6
 
 
 def _pie(labels, values, title, subtitle, colors=PIE_COLORS):
+    values = [v * 4000 for v in values]
     fig = px.pie(names=labels, values=values,
                  color_discrete_sequence=colors, hole=0.42)
     fig.update_traces(
         textposition='outside', textinfo='label+percent',
-        hovertemplate='<b>%{label}</b><br>$%{value:,.0f}<br>%{percent}<extra></extra>',
+        hovertemplate='<b>%{label}</b><br>%{value:,.0f}៛<br>%{percent}<extra></extra>',
         marker=dict(line=dict(color='white', width=2))
     )
     lo = _lo(300)
@@ -78,20 +80,21 @@ def _pie(labels, values, title, subtitle, colors=PIE_COLORS):
 
 
 def _hist_h(labels, values, title, subtitle, color='#7c3aed'):
+    values = [v * 4000 for v in values]
     df_h = pd.DataFrame({'label': labels, 'value': values}).sort_values('value')
     fig  = px.bar(df_h, x='value', y='label', orientation='h',
                   text='value', color_discrete_sequence=[color])
     fig.update_traces(
         textposition='outside',
-        texttemplate='$%{text:,.0f}',
-        hovertemplate='<b>%{y}</b><br>$%{x:,.0f}<extra></extra>',
+        texttemplate='%{text:,.0f}៛',
+        hovertemplate='<b>%{y}</b><br>%{x:,.0f}៛<extra></extra>',
         marker=dict(line=dict(color='white', width=1))
     )
     lo = _lo(max(260, len(labels) * 34))
     lo['xaxis_title'] = None; lo['yaxis_title'] = None
     lo['bargap'] = 0.28; lo['margin'] = dict(l=10, r=80, t=16, b=10)
     fig.update_layout(**lo)
-    fig.update_xaxes(tickformat='$,.0f')
+    fig.update_xaxes(ticksuffix='៛', tickformat=',.0f')
     _cc(title, subtitle, fig)
 
 
@@ -107,5 +110,122 @@ with c3:
     _pie(ct_labels, ct.values.tolist(),
          "Revenue by Customer Type", "Private vs Government",
          colors=['#7c3aed','#059669','#f59e0b','#ef4444'])
+
+# ══════════════════════════════════════════ REVENUE BY SERVICE TYPE ══
+st.markdown(
+    '<div style="display:flex;align-items:center;gap:10px;margin:32px 0 16px;">'
+    '<span style="font-size:.65rem;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:.14em;">🎯 Revenue by Service Type</span>'
+    '<div style="flex:1;height:1.5px;background:linear-gradient(90deg,rgba(245,158,11,.25),transparent);"></div>'
+    '</div>', unsafe_allow_html=True
+)
+
+SVC_COLORS = {'Basic': '#3b82f6', 'Standard': '#7c3aed', 'Premium': '#f59e0b'}
+ALL_SVC    = ['Basic', 'Standard', 'Premium']
+
+# ── Per service type totals ──
+svc_rev    = flt.groupby('Service Type')['Revenue'].sum()
+svc_cnt    = flt.groupby('Service Type').size()
+grand_rev  = flt['Revenue'].sum()
+
+# KPI cards per service type
+kpi_html = '<div style="display:flex;gap:14px;margin:0 0 24px;flex-wrap:wrap;">'
+for svc in ALL_SVC:
+    rev  = svc_rev.get(svc, 0)
+    cnt  = svc_cnt.get(svc, 0)
+    pct  = rev / grand_rev * 100 if grand_rev > 0 else 0
+    avg  = rev / cnt if cnt > 0 else 0
+    col  = SVC_COLORS[svc]
+    kpi_html += (
+        f'<div style="flex:1;min-width:160px;background:#fff;border-radius:18px;padding:20px 22px;'
+        f'border-top:4px solid {col};box-shadow:0 2px 16px rgba(0,0,0,.07);">'
+        f'<div style="font-size:.62rem;font-weight:800;color:{col};text-transform:uppercase;letter-spacing:.12em;">{svc}</div>'
+        f'<div style="font-size:1.6rem;font-weight:900;color:#111827;margin-top:6px;">{rev*4000:,.0f} ៛</div>'
+        f'<div style="display:flex;justify-content:space-between;margin-top:8px;">'
+        f'<span style="font-size:.68rem;color:#6b7280;">{pct:.1f}% of total</span>'
+        f'<span style="font-size:.68rem;color:#6b7280;">{cnt:,} samples</span>'
+        f'</div>'
+        f'<div style="font-size:.65rem;color:#9ca3af;margin-top:3px;">avg {avg*4000:,.0f} ៛ / sample</div>'
+        f'<div style="background:#f3f4f6;border-radius:20px;height:5px;margin-top:10px;">'
+        f'<div style="background:{col};height:5px;border-radius:20px;width:{pct:.1f}%;"></div>'
+        f'</div>'
+        f'</div>'
+    )
+kpi_html += '</div>'
+st.markdown(kpi_html, unsafe_allow_html=True)
+
+st.markdown(
+    '<div style="background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);'
+    'border-radius:28px;padding:24px;'
+    'box-shadow:0 4px 28px rgba(245,158,11,.09);'
+    'border:1.5px solid rgba(245,158,11,.2);">',
+    unsafe_allow_html=True
+)
+
+sc1, sc2 = st.columns(2)
+
+with sc1:
+    # Pie — revenue share by service type
+    pie_labels = [s for s in ALL_SVC if s in svc_rev.index]
+    pie_values = [svc_rev[s] for s in pie_labels]
+    fig_svc_pie = px.pie(
+        names=pie_labels, values=pie_values,
+        color=pie_labels,
+        color_discrete_map=SVC_COLORS,
+        hole=0.45,
+    )
+    fig_svc_pie.update_traces(
+        textposition='outside', textinfo='label+percent',
+        hovertemplate='<b>%{label}</b><br>%{value:,.0f}៛<br>%{percent}<extra></extra>',
+        marker=dict(line=dict(color='white', width=2)),
+    )
+    lo_p = _lo(300)
+    lo_p['showlegend'] = True
+    lo_p['legend'] = dict(orientation='v', x=1.02, y=0.5,
+                          font=dict(size=11, color=BLK), bgcolor='rgba(255,255,255,.9)')
+    fig_svc_pie.update_layout(**lo_p)
+    _cc("Revenue Share by Service Type",
+        f"Basic / Standard / Premium · {start.strftime('%d %b')} – {end.strftime('%d %b %Y')}",
+        fig_svc_pie, h=300)
+
+with sc2:
+    # Stacked bar — revenue per lab broken down by service type
+    lab_svc = flt.groupby(['Laboratory', 'Service Type'])['Revenue'].sum().unstack(fill_value=0)
+    rows_bar = []
+    for lab in lab_svc.index:
+        for svc in ALL_SVC:
+            rows_bar.append({
+                'Laboratory':    lab,
+                'Service Type':  svc,
+                'Revenue':       (lab_svc.loc[lab, svc] if svc in lab_svc.columns else 0) * 4000,
+            })
+    df_bar = pd.DataFrame(rows_bar)
+    # sort labs by total revenue desc
+    lab_order = flt.groupby('Laboratory')['Revenue'].sum().sort_values(ascending=True).index.tolist()
+    df_bar['Laboratory'] = pd.Categorical(df_bar['Laboratory'], categories=lab_order, ordered=True)
+    df_bar = df_bar.sort_values('Laboratory')
+
+    fig_stk = px.bar(
+        df_bar, x='Revenue', y='Laboratory', color='Service Type',
+        orientation='h', barmode='stack',
+        color_discrete_map=SVC_COLORS,
+        text='Revenue',
+    )
+    fig_stk.update_traces(
+        textposition='inside',
+        texttemplate='%{text:,.0f}៛',
+        hovertemplate='<b>%{y}</b> · %{data.name}<br>%{x:,.0f}៛<extra></extra>',
+    )
+    lo_s = _lo(max(260, len(lab_svc) * 52))
+    lo_s['xaxis_title'] = None; lo_s['yaxis_title'] = None
+    lo_s['bargap'] = 0.28; lo_s['margin'] = dict(l=10, r=20, t=16, b=10)
+    lo_s['xaxis'] = dict(ticksuffix='៛', tickformat=',.0f')
+    lo_s['legend'] = dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
+                          font=dict(size=10, color=BLK))
+    fig_stk.update_layout(**lo_s)
+    _cc("Revenue by Lab & Service Type",
+        "Stacked: Basic / Standard / Premium per laboratory",
+        fig_stk, h=max(260, len(lab_svc) * 52))
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 render_footer()

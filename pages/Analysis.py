@@ -3,6 +3,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from utils import (
+    fmt_riel,
     CSS, load_data, check_login, render_sidebar, render_footer,
     date_range_picker, apply_dr, _skpi, _cc, _tbl, _page_header, _lo, BLK, MN
 )
@@ -152,19 +153,18 @@ with c3:
 with c4:
     fig_rev = px.bar(
         x=top5_rev['Revenue'], y=top5_rev['Parameter'],
-        orientation='h', text=[f"${v:,.0f}" for v in top5_rev['Revenue']],
+        orientation='h', text=[fmt_riel(v) for v in top5_rev['Revenue']],
         color_discrete_sequence=['#059669'], labels={'x':'Revenue','y':''}
     )
     fig_rev.update_traces(
         textposition='outside', texttemplate='%{text}',
-        hovertemplate='<b>%{y}</b><br>$%{x:,.0f}<extra></extra>',
+        hovertemplate='<b>%{y}</b><br>%{x:,.0f}៛<extra></extra>',
         marker=dict(line=dict(color='white', width=1))
     )
     fig_rev.update_layout(**lo2)
-    fig_rev.update_xaxes(tickformat='$,.0f')
+    fig_rev.update_xaxes(ticksuffix='៛', tickformat=',.0f')
     _cc("Top 5 Parameters by Revenue", "Highest earning parameters", fig_rev)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ── Parameters by Laboratory table ──
 render_footer()
