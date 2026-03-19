@@ -250,16 +250,14 @@ ALL_NAV = [
 
 
 def check_login(current_page: str = ""):
-    """
-    Verify the user is logged in AND is allowed to view current_page.
-    Redirects to login or their first allowed page if not authorised.
-    """
+    """Auth disabled — everyone gets SuperAdmin access."""
     if not st.session_state.get("logged_in"):
-        st.switch_page("main.py")
-        st.stop()
-
+        st.session_state["logged_in"] = True
+        st.session_state["user"] = {
+            "role": "SuperAdmin", "display": "Admin", "page": "Financial"
+        }
     if current_page:
-        role    = st.session_state["user"]["role"]
+        role    = "SuperAdmin"
         allowed = ROLE_PAGE.get(role, [])
         if allowed and current_page not in allowed:
             st.switch_page(f"pages/{allowed[0]}.py")
