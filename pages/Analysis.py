@@ -3,6 +3,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from utils import (
+    _inject_pie_spin, _cc_pie,
     fmt_riel,
     CSS, load_data, check_login, render_sidebar, render_footer,
     date_range_picker, apply_dr, _skpi, _cc, _tbl, _page_header, _lo, BLK, MN
@@ -19,6 +20,7 @@ st.set_page_config(
 st.markdown(CSS, unsafe_allow_html=True)
 check_login("Analysis")
 render_sidebar("Analysis")
+_inject_pie_spin()
 
 # ══════════════════════════════════════════════════════════ PAGE ══════
 df, params_df, param_rows, org_info = load_data()
@@ -86,9 +88,9 @@ with c_lab1:
     lo['legend'] = dict(orientation='v', x=1.02, y=0.5,
                         font=dict(size=10, color=BLK), bgcolor='rgba(255,255,255,.9)')
     fig_pie_lab.update_layout(**lo)
-    _cc("Samples by Lab",
+    _cc_pie("Samples by Lab",
         f"Distribution per lab ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})",
-        fig_pie_lab, h=300)
+        fig_pie_lab, key="lab_pie", h=300)
 
 with c_lab2:
     service_dist = flt['Service Type'].value_counts()
@@ -103,9 +105,9 @@ with c_lab2:
         marker=dict(line=dict(color='white', width=2))
     )
     fig_pie_svc.update_layout(**lo)
-    _cc("Service Type Distribution",
-        f"Basic / Standard / Premium ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})",
-        fig_pie_svc, h=300)
+    _cc_pie("Service Type Distribution",
+        f"Normal / Express ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})",
+        fig_pie_svc, key="svc_pie_a", h=300)
 
 # ══════════════════════════════════════════════ PARAMETER ANALYSIS ══
 st.markdown(

@@ -3,6 +3,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from utils import (
+    _inject_pie_spin, _cc_pie,
     fmt_riel,
     CSS, load_data, check_login, render_sidebar, render_footer,
     date_range_picker, apply_dr, _skpi, _cc, _tbl, _page_header, _lo, BLK, MN
@@ -19,6 +20,7 @@ st.set_page_config(
 st.markdown(CSS, unsafe_allow_html=True)
 check_login("Financial")
 render_sidebar("Financial")
+_inject_pie_spin()
 
 # ══════════════════════════════════════════════════════════ PAGE ══════
 df, params_df, param_rows, org_info = load_data()
@@ -37,14 +39,14 @@ if n == 0:
 # ── KPI sparklines ──
 rev_by_m  = df.groupby(df['Service Date'].dt.month)['Revenue'].sum()
 cnt_by_m  = df.groupby(df['Service Date'].dt.month).size()
-priv_by_m = df[df['Customer Type']=='Private Company'].groupby(df['Service Date'].dt.month)['Revenue'].sum()
+priv_by_m = df[df['Customer Type'].isin(['Business Owner','Factory','Clean Water'])].groupby(df['Service Date'].dt.month)['Revenue'].sum()
 ot_by_m   = df[df['On time/Late']=='On-Time'].groupby(df['Service Date'].dt.month).size() / cnt_by_m * 100
 
 to_m = end.month; fr_m = start.month; pr_m = to_m - 1
 
 total_rev  = flt['Revenue'].sum()
 total_cnt  = len(flt)
-total_priv = flt[flt['Customer Type']=='Private Company']['Revenue'].sum()
+total_priv = flt[flt['Customer Type'].isin(['Business Owner','Factory','Clean Water'])]['Revenue'].sum()
 total_ot   = (flt['On time/Late']=='On-Time').mean() * 100 if n else 0
 
 _skpi(None, [
@@ -76,7 +78,7 @@ def _pie(labels, values, title, subtitle, colors=PIE_COLORS):
     lo['legend'] = dict(orientation='v', x=1.02, y=0.5,
                         font=dict(size=10, color=BLK), bgcolor='rgba(255,255,255,.9)')
     fig.update_layout(**lo)
-    _cc(title, subtitle, fig, h=300)
+    _cc_pie(title, subtitle, fig, key=title, h=300)
 
 
 def _hist_h(labels, values, title, subtitle, color='#7c3aed'):
@@ -98,18 +100,48 @@ def _hist_h(labels, values, title, subtitle, color='#7c3aed'):
     _cc(title, subtitle, fig)
 
 
-c1, c2, c3 = st.columns(3)
+c1, c2 = st.columns(2)
 with c1:
     _pie(rev_lab.index.tolist(), rev_lab.values.tolist(),
          "Revenue by Lab", "Share per laboratory")
 with c2:
     _hist_h(rev_prov.index.tolist(), rev_prov.values.tolist(),
             "Revenue by Province", "Total revenue per province", color='#059669')
-with c3:
-    ct_labels = [c.replace(' Company','').replace(' Department','') for c in ct.index]
-    _pie(ct_labels, ct.values.tolist(),
-         "Revenue by Customer Type", "Private vs Government",
-         colors=['#7c3aed','#059669','#f59e0b','#ef4444'])
+
+# Customer type pie — full width, legend at bottom so all 12 types are visible
+ct_labels = ct.index.tolist()
+ct_values = [v * 4000 for v in ct.values.tolist()]
+fig_ct = px.pie(
+    names=ct_labels, values=ct_values,
+    color_discrete_sequence=['#7c3aed','#3b82f6','#059669','#f59e0b','#ef4444',
+                              '#ec4899','#06b6d4','#a78bfa','#f97316','#10b981','#8b5cf6','#64748b'],
+    hole=0.38,
+)
+fig_ct.update_traces(
+    textposition='outside', textinfo='label+percent',
+    hovertemplate='<b>%{label}</b><br>%{value:,.0f}៛<br>%{percent}<extra></extra>',
+    marker=dict(line=dict(color='white', width=2)),
+)
+lo_ct = _lo(480)
+lo_ct['showlegend'] = True
+lo_ct['legend'] = dict(
+    orientation='h', yanchor='top', y=-0.08, xanchor='center', x=0.5,
+    font=dict(size=11, color=BLK), bgcolor='rgba(255,255,255,.9)',
+    itemwidth=80,
+)
+lo_ct['margin'] = dict(l=80, r=80, t=40, b=120)
+fig_ct.update_layout(**lo_ct)
+
+uid_ct = 'pie_ct_fin'
+st.markdown('<div class="cc"><div class="cc-bar"></div>', unsafe_allow_html=True)
+st.markdown('<h3 class="cc-title">Revenue by Customer Type</h3>', unsafe_allow_html=True)
+st.markdown('<p class="cc-sub">Distribution by customer type — all categories</p>', unsafe_allow_html=True)
+rot_ct = st.slider('↻ Rotate', 0, 359, 0, step=3, key=uid_ct, label_visibility='collapsed')
+for trace in fig_ct.data:
+    if hasattr(trace, 'rotation'):
+        trace.rotation = rot_ct
+st.plotly_chart(fig_ct, use_container_width=True, config={'displayModeBar':'hover','scrollZoom':False,'displaylogo':False})
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ══════════════════════════════════════════ REVENUE BY SERVICE TYPE ══
 st.markdown(
@@ -119,8 +151,8 @@ st.markdown(
     '</div>', unsafe_allow_html=True
 )
 
-SVC_COLORS = {'Basic': '#3b82f6', 'Standard': '#7c3aed', 'Premium': '#f59e0b'}
-ALL_SVC    = ['Basic', 'Standard', 'Premium']
+SVC_COLORS = {'Normal': '#3b82f6', 'Express': '#f59e0b'}
+ALL_SVC    = ['Normal', 'Express']
 
 # ── Per service type totals ──
 svc_rev    = flt.groupby('Service Type')['Revenue'].sum()
@@ -183,9 +215,9 @@ with sc1:
     lo_p['legend'] = dict(orientation='v', x=1.02, y=0.5,
                           font=dict(size=11, color=BLK), bgcolor='rgba(255,255,255,.9)')
     fig_svc_pie.update_layout(**lo_p)
-    _cc("Revenue Share by Service Type",
-        f"Basic / Standard / Premium · {start.strftime('%d %b')} – {end.strftime('%d %b %Y')}",
-        fig_svc_pie, h=300)
+    _cc_pie("Revenue Share by Service Type",
+        f"Normal / Express · {start.strftime('%d %b')} – {end.strftime('%d %b %Y')}",
+        fig_svc_pie, key="svc_pie", h=300)
 
 with sc2:
     # Stacked bar — revenue per lab broken down by service type
@@ -223,7 +255,7 @@ with sc2:
                           font=dict(size=10, color=BLK))
     fig_stk.update_layout(**lo_s)
     _cc("Revenue by Lab & Service Type",
-        "Stacked: Basic / Standard / Premium per laboratory",
+        "Stacked: Normal / Express per laboratory",
         fig_stk, h=max(260, len(lab_svc) * 52))
 
 st.markdown('</div>', unsafe_allow_html=True)

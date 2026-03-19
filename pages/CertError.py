@@ -3,12 +3,13 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from utils import (
+    _inject_pie_spin,
     CSS, load_data, check_login, render_sidebar, render_footer,
     date_range_picker, apply_dr, _cc, _tbl, _page_header, _lo, BLK
 )
 import plotly.express as px
 import pandas as pd
-
+from utils import _cc_pie
 st.set_page_config(
     page_title="LabCare · Certificate Errors",
     page_icon="⚠️",
@@ -18,6 +19,7 @@ st.set_page_config(
 st.markdown(CSS, unsafe_allow_html=True)
 check_login("CertError")
 render_sidebar("CertError")
+_inject_pie_spin()
 
 # ══════════════════════════════════════════════════════════ PAGE ══════
 df, params_df, param_rows, org_info = load_data()

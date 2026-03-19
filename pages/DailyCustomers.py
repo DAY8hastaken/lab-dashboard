@@ -7,7 +7,7 @@ from utils import (
     _page_header
 )
 import pandas as pd
-
+from utils import _cc_pie
 st.set_page_config(
     page_title="LabCare · Daily Customers",
     page_icon="👥",

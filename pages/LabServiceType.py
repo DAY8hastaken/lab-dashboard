@@ -3,6 +3,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from utils import (
+    _inject_pie_spin, _cc_pie,
     CSS, load_data, check_login, render_sidebar, render_footer,
     date_range_picker, apply_dr, _tbl, _cc, _page_header, _lo, BLK, MN
 )
@@ -18,12 +19,13 @@ st.set_page_config(
 st.markdown(CSS, unsafe_allow_html=True)
 check_login("LabServiceType")
 render_sidebar("LabServiceType")
+_inject_pie_spin()
 
 # ══════════════════════════════════════════════════════════ PAGE ══════
 df, params_df, param_rows, org_info = load_data()
 
 _page_header("Pages / Lab Service Type", "🧪 Lab Service Type",
-             "Sample distribution across Basic, Standard and Premium service types per laboratory.")
+             "Sample distribution across Normal and Express service types per laboratory.")
 
 start, end         = date_range_picker("labsvc", df)
 flt, flt_params, n = apply_dr(df, param_rows, start, end)
@@ -35,14 +37,14 @@ if n == 0:
 
 # ── Aggregation ──
 lab_service  = flt.groupby(['Laboratory','Service Type']).size().unstack(fill_value=0)
-all_services = ['Basic','Standard','Premium']
-svc_colors   = {'Basic': '#3b82f6', 'Standard': '#7c3aed', 'Premium': '#f59e0b'}
+all_services = ['Normal','Express']
+svc_colors   = {'Normal': '#3b82f6', 'Express': '#f59e0b'}
 
 # ── KPI summary strip ──
-total_basic    = int(flt[flt['Service Type']=='Basic'].shape[0])
-total_standard = int(flt[flt['Service Type']=='Standard'].shape[0])
-total_premium  = int(flt[flt['Service Type']=='Premium'].shape[0])
-total_all      = total_basic + total_standard + total_premium
+total_normal    = int(flt[flt['Service Type']=='Normal'].shape[0])
+total_express = int(flt[flt['Service Type']=='Express'].shape[0])
+total_express  = int(flt[flt['Service Type']=='Express'].shape[0])
+total_all      = total_normal + total_express + total_express
 
 st.markdown(
     f'<div style="display:flex;gap:14px;margin:0 0 24px;flex-wrap:wrap;">'
@@ -53,21 +55,21 @@ st.markdown(
     f'</div>'
     f'<div style="flex:1;min-width:130px;background:#fff;border-radius:18px;padding:18px 20px;'
     f'border-top:4px solid #3b82f6;box-shadow:0 2px 12px rgba(0,0,0,.06);">'
-    f'<div style="font-size:.6rem;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.12em;">Basic</div>'
-    f'<div style="font-size:1.7rem;font-weight:900;color:#3b82f6;margin-top:4px;">{total_basic:,}</div>'
-    f'<div style="font-size:.65rem;color:#6b7280;margin-top:2px;">{total_basic/total_all*100:.1f}% of total</div>'
+    f'<div style="font-size:.6rem;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.12em;">Normal</div>'
+    f'<div style="font-size:1.7rem;font-weight:900;color:#3b82f6;margin-top:4px;">{total_normal:,}</div>'
+    f'<div style="font-size:.65rem;color:#6b7280;margin-top:2px;">{total_normal/total_all*100:.1f}% of total</div>'
     f'</div>'
     f'<div style="flex:1;min-width:130px;background:#fff;border-radius:18px;padding:18px 20px;'
     f'border-top:4px solid #7c3aed;box-shadow:0 2px 12px rgba(0,0,0,.06);">'
-    f'<div style="font-size:.6rem;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.12em;">Standard</div>'
-    f'<div style="font-size:1.7rem;font-weight:900;color:#7c3aed;margin-top:4px;">{total_standard:,}</div>'
-    f'<div style="font-size:.65rem;color:#6b7280;margin-top:2px;">{total_standard/total_all*100:.1f}% of total</div>'
+    f'<div style="font-size:.6rem;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.12em;">Express</div>'
+    f'<div style="font-size:1.7rem;font-weight:900;color:#7c3aed;margin-top:4px;">{total_express:,}</div>'
+    f'<div style="font-size:.65rem;color:#6b7280;margin-top:2px;">{total_express/total_all*100:.1f}% of total</div>'
     f'</div>'
     f'<div style="flex:1;min-width:130px;background:#fff;border-radius:18px;padding:18px 20px;'
     f'border-top:4px solid #f59e0b;box-shadow:0 2px 12px rgba(0,0,0,.06);">'
-    f'<div style="font-size:.6rem;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.12em;">Premium</div>'
-    f'<div style="font-size:1.7rem;font-weight:900;color:#f59e0b;margin-top:4px;">{total_premium:,}</div>'
-    f'<div style="font-size:.65rem;color:#6b7280;margin-top:2px;">{total_premium/total_all*100:.1f}% of total</div>'
+    f'<div style="font-size:.6rem;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.12em;">Express</div>'
+    f'<div style="font-size:1.7rem;font-weight:900;color:#f59e0b;margin-top:4px;">{total_express:,}</div>'
+    f'<div style="font-size:.65rem;color:#6b7280;margin-top:2px;">{total_express/total_all*100:.1f}% of total</div>'
     f'</div>'
     f'</div>',
     unsafe_allow_html=True
@@ -127,9 +129,7 @@ with ch2:
     lo2['legend'] = dict(orientation='v', x=1.02, y=0.5,
                          font=dict(size=10, color=BLK), bgcolor='rgba(255,255,255,.9)')
     fig_pie.update_layout(**lo2)
-    _cc("Service Type Distribution",
-        f"Overall split across all labs ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})",
-        fig_pie, h=300)
+    _cc_pie("Service Type Distribution", f"Overall split across all labs ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})", fig_pie, key="labsvc_pie", h=300)
 
 # ── Detailed table ──
 st.markdown(
@@ -160,9 +160,9 @@ st.markdown(
 )
 _tbl(
     "Lab Samples by Service Type",
-    f"Sample count: Basic / Standard / Premium  ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})",
+    f"Sample count: Normal / Express  ({start.strftime('%d %b')} – {end.strftime('%d %b %Y')})",
     lab_service_rows, accent='#3b82f6',
-    cols=['Laboratory','Basic','Standard','Premium','Total']
+    cols=['Laboratory','Normal','Express','Total']
 )
 st.markdown('</div>', unsafe_allow_html=True)
 
