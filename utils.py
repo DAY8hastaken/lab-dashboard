@@ -177,7 +177,7 @@ def load_data():
         import numpy as np
         np.random.seed(42)
         df['Service Type'] = np.random.choice(
-            ['Basic', 'Standard', 'Premium'], size=len(df), p=[0.35, 0.45, 0.20]
+            ['Normal', 'Express'], size=len(df), p=[0.55, 0.45]
         )
 
     today = pd.Timestamp('2025-12-31')
@@ -316,7 +316,7 @@ def _lo(h=230):
     return dict(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font=dict(family='DM Sans', color=BLK, size=11),
-        height=h, margin=dict(l=10, r=10, t=16, b=10),
+        height=h, margin=dict(l=60, r=60, t=30, b=30), autosize=True,
         xaxis=dict(gridcolor='rgba(0,0,0,.05)', zeroline=False, showline=False,
                    tickfont=dict(size=10, color=BLK), title_font=dict(size=11, color=BLK)),
         yaxis=dict(gridcolor='rgba(0,0,0,.05)', zeroline=False, showline=False,
@@ -636,9 +636,81 @@ def _cc(title, subtitle, fig, h=None):
     st.markdown('<div class="cc"><div class="cc-bar"></div>', unsafe_allow_html=True)
     st.markdown(f'<h3 class="cc-title">{title}</h3>', unsafe_allow_html=True)
     st.markdown(f'<p class="cc-sub">{subtitle}</p>', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+    st.plotly_chart(fig, use_container_width=True, config={
+        'displayModeBar': 'hover',
+        'scrollZoom': True,
+        'modeBarButtonsToRemove': ['lasso2d','select2d','autoScale2d'],
+        'displaylogo': False,
+    })
     st.markdown('</div>', unsafe_allow_html=True)
 
+
+
+def _inject_pie_spin():
+    """Inject JS once per page load to make all pie charts spin on mouse wheel."""
+    import streamlit.components.v1 as components
+    components.html("""
+<script>
+(function() {
+  // Track rotation per chart div
+  var rotations = {};
+
+  function attachSpin(div) {
+    if (div._pieSpinAttached) return;
+    div._pieSpinAttached = true;
+    var rot = 0;
+
+    div.addEventListener('wheel', function(e) {
+      var gd = div;
+      var data = gd.data || [];
+      var hasPie = data.some(function(t){ return t.type === 'pie' || t.type === 'sunburst'; });
+      if (!hasPie) return;
+      e.preventDefault();
+      e.stopPropagation();
+      rot = (rot + (e.deltaY > 0 ? 8 : -8) + 360) % 360;
+      var update = {};
+      data.forEach(function(t, i){
+        if (t.type === 'pie' || t.type === 'sunburst') {
+          update['rotation[' + i + ']'] = rot;
+        }
+      });
+      if (window.Plotly) window.Plotly.restyle(gd, update);
+    }, {passive: false});
+  }
+
+  function scanAndAttach() {
+    document.querySelectorAll('.js-plotly-plot').forEach(attachSpin);
+  }
+
+  // Scan immediately and repeatedly for new charts added by Streamlit
+  scanAndAttach();
+  var obs = new MutationObserver(scanAndAttach);
+  obs.observe(document.body, {childList: true, subtree: true});
+  setInterval(scanAndAttach, 1000);
+})();
+</script>
+""", height=0)
+
+
+def _cc_pie(title, subtitle, fig, key, h=300):
+    """Chart card wrapper for pie charts — includes a rotation slider."""
+    import hashlib
+    uid = 'pie_' + hashlib.md5((title + key).encode()).hexdigest()[:8]
+    st.markdown('<div class="cc"><div class="cc-bar"></div>', unsafe_allow_html=True)
+    st.markdown(f'<h3 class="cc-title">{title}</h3>', unsafe_allow_html=True)
+    st.markdown(f'<p class="cc-sub">{subtitle}</p>', unsafe_allow_html=True)
+    rot = st.slider('↻ Rotate', 0, 359, 0, step=3, key=uid, label_visibility='collapsed')
+    # Apply rotation to every pie/sunburst trace
+    for trace in fig.data:
+        if hasattr(trace, 'rotation'):
+            trace.rotation = rot
+    fig.update_layout(height=h)
+    st.plotly_chart(fig, use_container_width=True, config={
+        'displayModeBar': 'hover',
+        'scrollZoom': False,
+        'displaylogo': False,
+    })
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def _page_header(breadcrumb, title, subtitle):
     st.markdown(
